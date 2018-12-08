@@ -17,7 +17,7 @@ services:
     - "8100:8000"
     volumes:
     - web_static:/code/static/
-    - /var/docker/Hackaton-Plus/prod/nginx-logs/:/logs
+    - /srv/docker/Hackaton-Plus/prod/nginx-logs/:/logs
     depends_on:
     - django
     links:
@@ -40,7 +40,8 @@ services:
        - postgres
     volumes:
        - web_static:/code/static
-       - /var/docker/Hackaton-Plus/prod/django-logs/:/logs
+       - /srv/docker/Hackaton-Plus/prod/django-logs/:/logs
+       - /srv/docker/Hackaton-Plus/prod/django-tmp/:/tmp/
     depends_on:
        - postgres
 

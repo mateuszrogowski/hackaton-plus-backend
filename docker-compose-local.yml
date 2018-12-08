@@ -28,6 +28,7 @@ services:
        - postgres
     volumes:
        - ./django-app:/code
+       - /srv/docker/Hackaton-Plus/dev/django-tmp/:/tmp/
        - web_static:/code/static
     depends_on:
        - postgres
