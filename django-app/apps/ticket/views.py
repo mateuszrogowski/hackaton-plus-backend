@@ -1,4 +1,7 @@
 # from PIL import Image
+import base64
+import io
+
 from django.conf import settings
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -8,6 +11,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
+from django.core.files.base import ContentFile
 
 from apps.ticket import ticket_utils
 from apps.ticket.models import Ticket
@@ -55,13 +59,16 @@ class TicketViewSet(viewsets.GenericViewSet):
             # process file
             data_from_ticket = ticket_utils.process_ticket(ticket_file)
 
+            try:
+                qr_code = ticket_utils.extract_qr_code(ticket_file)
+                base64_encoded_qr_code_str = ticket_utils.pil_image_to_base64(qr_code)
+            except ValueError:
+                base64_encoded_qr_code_str = None
+
+            data_from_ticket['qr_code'] = base64_encoded_qr_code_str
             ticket = Ticket(**data_from_ticket)
             ticket.save()
 
-            # response_data = {
-            #     'id': 0,
-            # }
-            # response_data.update(data_from_ticket)
             return Response(self.serializer_class_get(ticket).data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

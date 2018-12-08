@@ -1,7 +1,13 @@
+import base64
+import io
+
 from django.core.files.uploadedfile import InMemoryUploadedFile
 import re
 from tika import parser
 from datetime import datetime
+
+import PyPDF2
+from PIL import Image
 
 
 def process_ticket(ticket_file: InMemoryUploadedFile) -> dict:
@@ -66,3 +72,35 @@ def process_ticket(ticket_file: InMemoryUploadedFile) -> dict:
     parsed_info["total_length"] = total_length
 
     return parsed_info
+
+
+def extract_qr_code(ticket_file: InMemoryUploadedFile):
+    ticket = PyPDF2.PdfFileReader(ticket_file)
+    page = ticket.getPage(0)
+    xObject = page['/Resources']['/XObject'].getObject()
+    img = None
+
+    for obj in xObject:
+        if xObject[obj]['/Subtype'] == '/Image':
+            if xObject[obj]['/Width'] == 150 and xObject[obj]['/Height'] == 150:
+                img = Image.frombytes(
+                    mode="RGB",
+                    size=(xObject[obj]['/Width'], xObject[obj]['/Height']),
+                    data=xObject[obj].getData()
+                )
+    if img is None:
+        raise ValueError("QRCode not found.")
+
+    return img
+
+
+def pil_image_to_base64(image: Image) -> str:
+    qr_code_mem_file = io.BytesIO()
+    image.save(qr_code_mem_file, format="PNG")
+    # reset file pointer to start
+    qr_code_mem_file.seek(0)
+    img_bytes = qr_code_mem_file.read()
+
+    base64_encoded_qr_code_bytes = base64.b64encode(img_bytes)
+    base64_encoded_qr_code_str = base64_encoded_qr_code_bytes.decode('ascii')
+    return base64_encoded_qr_code_str
