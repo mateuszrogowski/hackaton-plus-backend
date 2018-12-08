@@ -11,3 +11,7 @@ class TicketModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = '__all__'
+
+
+class TicketListSerializer(serializers.ListSerializer):
+    child = TicketModelSerializer()

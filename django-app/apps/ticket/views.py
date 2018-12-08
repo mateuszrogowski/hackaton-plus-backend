@@ -7,10 +7,11 @@ from rest_framework import status, viewsets  # , permissions
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
 
 from apps.ticket import ticket_utils
 from apps.ticket.models import Ticket
-from apps.ticket.serializers import TicketFileUploadSerializer, TicketModelSerializer
+from apps.ticket.serializers import TicketFileUploadSerializer, TicketModelSerializer, TicketListSerializer
 
 
 class TicketViewSet(viewsets.GenericViewSet):
@@ -22,6 +23,7 @@ class TicketViewSet(viewsets.GenericViewSet):
     # permission_classes = (permissions.IsAuthenticated,)
     serializer_class_post = TicketFileUploadSerializer
     serializer_class_get = TicketModelSerializer
+    serializer_class_list = TicketListSerializer
 
     def _check_file_type(self, file: InMemoryUploadedFile):
         r = Response(
@@ -39,7 +41,7 @@ class TicketViewSet(viewsets.GenericViewSet):
         else:
             return r
 
-    def post(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs):
 
         serializer = self.serializer_class_post(data=request.data)
         if serializer.is_valid() and 'multipart/form-data' in request.content_type:
@@ -64,6 +66,16 @@ class TicketViewSet(viewsets.GenericViewSet):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def get(self, request, *args, **kwargs):
-        serializer = self.serializer_class_get(data=request.data)
-        return Response("", status=status.HTTP_400_BAD_REQUEST)
+    def retrieve(self, request, pk=None):
+        serializer = self.serializer_class_get
+        print("Retrieve", pk)
+        ticket = get_object_or_404(Ticket, id=pk)
+
+        return Response(serializer(ticket).data, status=status.HTTP_200_OK)
+
+    def list(self, request):
+        serializer = self.serializer_class_list
+
+        tickets = Ticket.objects.all()
+
+        return Response(serializer(tickets).data, status=status.HTTP_200_OK)
