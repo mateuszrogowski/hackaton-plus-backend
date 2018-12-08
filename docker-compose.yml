@@ -1,0 +1,48 @@
+version: '2'
+
+services:
+  postgres:
+    restart: always
+    image: postgres:10.3-alpine
+    environment:
+      - POSTGRES_PASSWORD:'9b8f7d6bf3'
+    volumes:
+      - /srv/docker/Hackaton-Plus/prod/db/:/var/lib/postgresql/data
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile-web
+    command: ./entrypoint.sh
+    ports:
+    - "8100:8000"
+    volumes:
+    - web_static:/code/static/
+    - /var/docker/Hackaton-Plus/prod/nginx-logs/:/logs
+    depends_on:
+    - django
+    links:
+    - django
+  django:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile-django
+    command: ./entrypoint.sh
+    environment:
+       - DEPLOY_TYPE=compose
+       - DJANGO_SETTINGS_MODULE=hackaton_plus.settings
+       - DB_USER=postgres
+       - DB_PASSWORD=9b8f7d6bf3
+       - DB_NAME=postgres
+       - DB_HOST=postgres
+       - DEBUG=False
+    links:
+       - postgres
+    volumes:
+       - web_static:/code/static
+       - /var/docker/Hackaton-Plus/prod/django-logs/:/logs
+    depends_on:
+       - postgres
+
+volumes:
+  web_static:

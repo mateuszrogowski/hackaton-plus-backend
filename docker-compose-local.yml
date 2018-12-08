@@ -1,0 +1,36 @@
+version: '2'
+
+services:
+  postgres:
+    restart: always
+    image: postgres:10.3-alpine
+    environment:
+      - POSTGRES_PASSWORD:'4376bcf347'
+    volumes:
+      - /srv/docker/Hackaton-Plus/dev/db/:/var/lib/postgresql/data
+  django:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile-django
+    command: ./entrypoint-local.sh
+    environment:
+       - DEPLOY_TYPE=compose
+       - DJANGO_SETTINGS_MODULE=hackaton_plus.settings
+       - DB_USER=postgres
+       - DB_PASSWORD=4376bcf347
+       - DB_NAME=postgres
+       - DB_HOST=postgres
+       - DEBUG=True
+    ports:
+       - 8000:8000
+    links:
+       - postgres
+    volumes:
+       - ./django-app:/code
+       - web_static:/code/static
+    depends_on:
+       - postgres
+
+volumes:
+  web_static:
