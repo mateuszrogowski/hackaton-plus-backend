@@ -76,6 +76,6 @@ class TicketViewSet(viewsets.GenericViewSet):
     def list(self, request):
         serializer = self.serializer_class_list
 
-        tickets = Ticket.objects.all()
+        tickets = Ticket.objects.all().order_by('-start_time')
 
         return Response(serializer(tickets).data, status=status.HTTP_200_OK)
