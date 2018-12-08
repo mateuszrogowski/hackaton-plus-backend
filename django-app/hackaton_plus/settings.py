@@ -38,6 +38,7 @@ DEFAULT_APPS = [
 ]
 
 PROJECT_APPS = [
+    'apps.ticket'
 ]
 
 THIRD_PARTY_APPS = [

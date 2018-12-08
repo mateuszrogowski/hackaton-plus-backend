@@ -1,7 +1,7 @@
 from django.core.files.uploadedfile import InMemoryUploadedFile
 import re
 from tika import parser
-import json
+from datetime import datetime
 
 
 def process_ticket(ticket_file: InMemoryUploadedFile) -> dict:
@@ -21,15 +21,23 @@ def process_ticket(ticket_file: InMemoryUploadedFile) -> dict:
         )
     )
 
-    parsed_info["purchase_date"] = re.search("Data wydruku:.*", content)[0].replace("Data wydruku:", "").strip()
+    purchase_date = re.search("Data wydruku:.*", content)[0].replace("Data wydruku:", "").strip()
+    parsed_info["purchase_date"] = datetime.strptime(purchase_date, "%Y-%m-%d %H:%M:%S")
+    year = parsed_info["purchase_date"].year
     parsed_info["carrier"] = re.search("Przewoźnik:.*", content)[0].replace("Przewoźnik:", "").strip()
 
     basic_info = list(map(str.strip, re.search("(KL./CL.)(.*)( SUMA )", content_one_line)[2].split(" * ")))
-    parsed_info["start_time"] = basic_info[0] + " " + basic_info[1]
-    parsed_info["finish_time"] = basic_info[4] + " " + basic_info[5]
+
+    time_format = "%Y.%d.%m %H:%M"
+    start_time = "{y}.{d} {t}".format(y=year, d=basic_info[0], t=basic_info[1])
+    parsed_info["start_time"] = datetime.strptime(start_time, time_format)
+
+    finish_time = "{y}.{d} {t}".format(y=year, d=basic_info[4], t=basic_info[5])
+    parsed_info["finish_time"] = datetime.strptime(finish_time, time_format)
+
     parsed_info["start_place"] = basic_info[2]
     parsed_info["finish_place"] = basic_info[3]
-    parsed_info["class"] = basic_info[6]
+    parsed_info["car_class"] = int(basic_info[6])
     parsed_info["stops"] = list(map(str.strip, re.search("(PRZEZ:)(.*)( SUMA )", content_one_line)[2].split(" * ")))
     parsed_info["cost"] = re.search("(SUMA PLN:)(.*?)( zł )", content_one_line)[2].strip().replace(",", ".")
 
