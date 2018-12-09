@@ -1,0 +1,50 @@
+{
+  "Przewoźnik": {
+    "TLK 81104": " PKP IC",
+    "TLK 35100": " PKP IC",
+    "IC 1000": " PKP IC",
+    "IC 4126": " PKP IC",
+    "IC 1613": " PKP IC",
+    "IC 6112": " PKP IC",
+    "TLK 53100": " PKP IC",
+    "IC 1511": " PKP IC",
+    "IC 5110": " PKP IC",
+    "TLK 53106": " PKP IC"
+  },
+  "Status": {
+    "TLK 81104": "Opóźniony",
+    "TLK 35100": "Opóźniony",
+    "IC 1000": "Opóźniony",
+    "IC 4126": "Opóźniony",
+    "IC 1613": "Na czas ",
+    "IC 6112": "Na czas ",
+    "TLK 53100": "Na czas ",
+    "IC 1511": "Opóźniony",
+    "IC 5110": "Na czas ",
+    "TLK 53106": "Opóźniony"
+  },
+  "Opóźnienie": {
+    "TLK 81104": "3m",
+    "TLK 35100": "30m",
+    "IC 1000": "35m",
+    "IC 4126": "35m",
+    "IC 1613": "0m",
+    "IC 6112": "0m",
+    "TLK 53100": "0m",
+    "IC 1511": "2h",
+    "IC 5110": "0m",
+    "TLK 53106": "4h"
+  },
+  "Przyczyna opóźnienia": {
+    "TLK 81104": "Złe warunki pogodowe na trasie",
+    "TLK 35100": "Awaria trakcji",
+    "IC 1000": "Wypadek na trasie",
+    "IC 4126": "Wypadek na trasie",
+    "IC 1613": "0",
+    "IC 6112": "0",
+    "TLK 53100": "0",
+    "IC 1511": "Awaria trakcji",
+    "IC 5110": "0",
+    "TLK 53106": "Awaria trakcji"
+  }
+}

@@ -1,6 +1,8 @@
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
+from apps.ticket import ticket_utils
+
 
 class Ticket(models.Model):
     tickets = ArrayField(
@@ -34,3 +36,12 @@ class Ticket(models.Model):
     total_length = models.IntegerField(null=True, default=None, blank=True)
     qr_code = models.TextField(verbose_name="QR Code", null=True, default=None, blank=True)
     upload_date = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def connection_current_info(self):
+        connection_current_info = ticket_utils.pull_connection_current_info(
+            self.train_number,
+            self.start_time,
+            self.start_place)
+
+        return connection_current_info

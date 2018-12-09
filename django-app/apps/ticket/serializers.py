@@ -12,6 +12,12 @@ CONTACT_PHONES = {"PKP Intercity (Grupa PKP)": "703 200 200", "PKP TLK": "703 20
                   "Koleje Małopolskie": "703 20 20 25"}
 
 
+class ConnectionInfoSerializer(serializers.Serializer):
+    status = serializers.CharField()
+    late = serializers.CharField()
+    late_reason = serializers.CharField()
+
+
 class TicketFileUploadSerializer(serializers.Serializer):
     ticket = serializers.FileField()
 
@@ -20,6 +26,8 @@ class TicketModelSerializer(serializers.ModelSerializer):
     carrier_contact_phone = serializers.SerializerMethodField()
     start_place_accessibility = serializers.SerializerMethodField()
     finish_place_accessibility = serializers.SerializerMethodField()
+
+    connection_current_info = ConnectionInfoSerializer()
 
     def get_carrier_contact_phone(self, obj: Ticket):
         carrier = obj.carrier
@@ -43,3 +51,4 @@ class TicketModelSerializer(serializers.ModelSerializer):
 
 class TicketListSerializer(serializers.ListSerializer):
     child = TicketModelSerializer()
+

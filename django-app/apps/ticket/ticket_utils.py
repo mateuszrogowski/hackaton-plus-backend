@@ -135,6 +135,20 @@ def pil_image_to_base64(image: Image) -> str:
     return base64_encoded_qr_code_str
 
 
+def pull_connection_current_info(train_number, start_time, start_place):
+    base_path = os.path.join(settings.BASE_DIR, 'apps/ticket/resources/')
+    late_trains_json = os.path.join(base_path, 'late_trains.json')
+
+    with open(late_trains_json, 'rt') as f:
+        late_trains = json.load(f)
+
+    return {
+        "status": late_trains["Status"].get(train_number, ""),
+        "late": late_trains["Opóźnienie"].get(train_number, ""),
+        "late_reason": late_trains["Przyczyna opóźnienia"].get(train_number, "")
+    }
+
+
 def load_accessibility():
     base_path = os.path.join(settings.BASE_DIR, 'apps/ticket/resources/')
     accessibility_json = os.path.join(base_path, 'dostepnosc_dworcow.json')
