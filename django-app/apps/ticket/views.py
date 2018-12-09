@@ -25,8 +25,8 @@ class TicketViewSet(viewsets.GenericViewSet):
     # http_method_names = ["POST"]
     parser_classes = (MultiPartParser, FormParser)
     # permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = TicketModelSerializer
     serializer_class_post = TicketFileUploadSerializer
-    serializer_class_get = TicketModelSerializer
     serializer_class_list = TicketListSerializer
 
     def _check_file_type(self, file: InMemoryUploadedFile):
@@ -69,12 +69,12 @@ class TicketViewSet(viewsets.GenericViewSet):
             ticket = Ticket(**data_from_ticket)
             ticket.save()
 
-            return Response(self.serializer_class_get(ticket).data, status=status.HTTP_200_OK)
+            return Response(self.serializer_class(ticket).data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, pk=None):
-        serializer = self.serializer_class_get
+        serializer = self.serializer_class
         print("Retrieve", pk)
         ticket = get_object_or_404(Ticket, id=pk)
 
