@@ -2,6 +2,7 @@
 
 import requests
 from dateutil.parser import parse
+from django.urls import reverse
 from icalendar import Calendar, Event
 from user_agent import generate_user_agent
 
@@ -20,9 +21,7 @@ class GoogleCalendarICS:
                 'User-Agent': generate_user_agent()
             })
 
-            url = 'http://mrogowski.nazwa.pl:8080/api/ticket/{ticket_id}/'.format(
-                ticket_id=self.ticket_id
-            )
+            url = reverse('ticket', kwargs={'pk': self.ticket_id})
 
             response = s.get(url).json()
 
@@ -55,8 +54,6 @@ class GoogleCalendarICS:
                 start_place=start_place,
                 finish_place=finish_place
             )
-
-            location = 'https://www.google.com/maps/place/Kolejowa%2FDworzec+PKP+(596)/@53.1246994,23.0933829,13z/data=!4m8!1m2!2m1!1sBia%C5%82ystok+pkp!3m4!1s0x0:0x36e8f0b66d99f9f1!8m2!3d53.1356495!4d23.1366277'
 
             event.add('summary', general_summary)
             event.add('dtstart', parse(train_start))
