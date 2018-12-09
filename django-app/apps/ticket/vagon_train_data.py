@@ -85,7 +85,7 @@ class VagonInformation:
             final_data['cars'] = {}
 
             for index, row in enumerate(train_info_table_data):
-                current_key = 'key_{}'.format(index+1)
+                current_key = 'key_{}'.format(index + 1)
                 vagon_data = {}
 
                 for value in row:
@@ -93,11 +93,12 @@ class VagonInformation:
                         vagon_data['number'] = ''.join(value.xpath('.//span/text()'))
 
                     elif value.xpath('@id')[0].startswith('trida1a_'):
-                        partial_url = value.xpath('.//img/@src')[0].split('..')[1].strip()
-
-                        full_url = urljoin('https://www.vagonweb.cz', partial_url)
-
-                        vagon_data['vagon_img'] = full_url
+                        continue
+                        # partial_url = value.xpath('.//img/@src')[0].split('..')[1].strip()
+                        #
+                        # full_url = urljoin('https://www.vagonweb.cz', partial_url)
+                        #
+                        # vagon_data['vagon_img'] = full_url
 
                     elif value.xpath('@id')[0].startswith('trida1b_'):
                         continue
@@ -107,7 +108,7 @@ class VagonInformation:
 
                         for item in icons:
                             vagon_data['titles_imgs_urls'] = list(
-                                        zip(item.xpath('.//img/@src'), item.xpath('.//img/@title')))
+                                zip(item.xpath('.//img/@src'), item.xpath('.//img/@title')))
 
                     elif value.xpath('@id')[0].startswith('trida2a_'):
                         continue
@@ -117,6 +118,12 @@ class VagonInformation:
 
                     elif value.xpath('@id')[0].startswith('trida2c_'):
                         continue
+
+                    elif value.xpath('@id')[0].startswith('trida2d_'):
+                        vagon_img_url = value.xpath('.//a[@class="colorbox cboxElement"]/@src')
+                        print(vagon_img_url)
+
+                        # partial_url = value.xpath('.//img/@src')[0].split('..')[1].strip()
 
                 if vagon_data.get('number'):
                     final_data['cars'][current_key] = vagon_data
