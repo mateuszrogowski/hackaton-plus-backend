@@ -1,6 +1,7 @@
 # from PIL import Image
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets  # , permissions
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -10,6 +11,28 @@ from apps.ticket import ticket_utils
 from apps.ticket.models import Ticket
 from apps.ticket.serializers import TicketFileUploadSerializer, TicketModelSerializer, TicketListSerializer
 from apps.ticket.vagon_train_data import VagonInformation
+from .calendar_ics import GoogleCalendarICS
+
+
+def generate_ics(request, ticket_id):
+    """
+    Generates ICS file for Google Calendar.
+    """
+
+    ics = GoogleCalendarICS(ticket_id=ticket_id)
+
+    ics_data = ics.generate_ics()
+
+    ticket_filename = 'ticket_{ticket_id}.ics'.format(ticket_id=ticket_id)
+
+    response = HttpResponse(
+        content=ics_data.to_ical(),
+        mimetype='application/force-download'
+    )
+
+    response['Content-Disposition'] = 'attachment; filename={}'.format(ticket_filename)
+
+    return response
 
 
 class TicketViewSet(viewsets.GenericViewSet):
