@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from apps.ticket import ticket_utils
 from apps.ticket.models import Ticket
 from apps.ticket.serializers import TicketFileUploadSerializer, TicketModelSerializer, TicketListSerializer
+from apps.ticket.vagon_train_data import VagonInformation
 
 
 class TicketViewSet(viewsets.GenericViewSet):
@@ -26,11 +27,11 @@ class TicketViewSet(viewsets.GenericViewSet):
         r = Response(
             {
                 'exception': "InvalidFileFormat",
-                'error_message': "Format of submitted file is invalid. Accepted file formats are jpg, jpeg, gif and png"
+                'error_message': "Format wysłanego pliku nie jest wspierany. Wyślij plik PDF"
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-        image_formats = ['application/pdf'] #, 'image/jpeg', 'image/gif', 'image/png']
+        image_formats = ['application/pdf']
 
         if file.content_type in image_formats:
             return None
@@ -60,6 +61,9 @@ class TicketViewSet(viewsets.GenericViewSet):
                 base64_encoded_qr_code_str = ticket_utils.pil_image_to_base64(qr_code)
             except ValueError:
                 base64_encoded_qr_code_str = None
+
+            car_info = VagonInformation(train_number=data_from_ticket['train_number'])
+            data_from_ticket['car_info'] = car_info.final_data
 
             data_from_ticket['qr_code'] = base64_encoded_qr_code_str
             ticket = Ticket(**data_from_ticket)

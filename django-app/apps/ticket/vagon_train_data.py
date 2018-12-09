@@ -54,7 +54,8 @@ class VagonInformation:
         Returns detailed train data info.
         """
 
-        final_data = {}
+        final_data = {
+        }
 
         params = {
             'zeme': self.company,
@@ -81,29 +82,22 @@ class VagonInformation:
 
             train_info_table_data = list(set([x for x in g.xml_etree.xpath(train_info_table_xpath)]))
 
-            for index, row in enumerate(train_info_table_data):
-                index = index + 1
+            final_data['cars'] = {}
 
-                final_data['key_{}'.format(index)] = []
+            for index, row in enumerate(train_info_table_data):
+                current_key = 'key_{}'.format(index+1)
+                vagon_data = {}
 
                 for value in row:
                     if value.xpath('@id')[0].startswith('trida1_'):
-                        final_data['key_{}'.format(index)].append(
-                            {
-                                'number': ''.join(value.xpath('.//span/text()'))
-                            }
-                        )
+                        vagon_data['number'] = ''.join(value.xpath('.//span/text()'))
 
                     elif value.xpath('@id')[0].startswith('trida1a_'):
                         partial_url = value.xpath('.//img/@src')[0].split('..')[1].strip()
 
                         full_url = urljoin('https://www.vagonweb.cz', partial_url)
 
-                        final_data['key_{}'.format(index)].append(
-                            {
-                                'vagon_img': full_url
-                            }
-                        )
+                        vagon_data['vagon_img'] = full_url
 
                     elif value.xpath('@id')[0].startswith('trida1b_'):
                         continue
@@ -112,12 +106,8 @@ class VagonInformation:
                         icons = value.xpath('.//span[@class="tab-pocmist"]')
 
                         for item in icons:
-                            final_data['key_{}'.format(index)].append(
-                                {
-                                    'titles_imgs_urls': list(
+                            vagon_data['titles_imgs_urls'] = list(
                                         zip(item.xpath('.//img/@src'), item.xpath('.//img/@title')))
-                                }
-                            )
 
                     elif value.xpath('@id')[0].startswith('trida2a_'):
                         continue
@@ -127,5 +117,13 @@ class VagonInformation:
 
                     elif value.xpath('@id')[0].startswith('trida2c_'):
                         continue
+
+                if vagon_data.get('number'):
+                    final_data['cars'][current_key] = vagon_data
+                else:
+                    final_data['train_info'] = vagon_data
+
+            vagon_mapping = {int(val['number']): key for key, val in final_data['cars'].items()}
+            final_data['car_mapping'] = vagon_mapping
 
         self.final_data = final_data

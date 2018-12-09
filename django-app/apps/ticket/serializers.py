@@ -29,6 +29,8 @@ class TicketModelSerializer(serializers.ModelSerializer):
 
     connection_current_info = ConnectionInfoSerializer()
 
+    car_info = serializers.JSONField()
+
     def get_carrier_contact_phone(self, obj: Ticket):
         carrier = obj.carrier
 

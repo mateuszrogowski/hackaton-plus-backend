@@ -1,4 +1,4 @@
-from django.contrib.postgres.fields import ArrayField
+from django.contrib.postgres.fields import ArrayField, JSONField
 from django.db import models
 
 from apps.ticket import ticket_utils
@@ -36,6 +36,7 @@ class Ticket(models.Model):
     total_length = models.IntegerField(null=True, default=None, blank=True)
     qr_code = models.TextField(verbose_name="QR Code", null=True, default=None, blank=True)
     upload_date = models.DateTimeField(auto_now_add=True)
+    car_info = JSONField(blank=True, default=None)
 
     @property
     def connection_current_info(self):

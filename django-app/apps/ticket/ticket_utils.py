@@ -158,4 +158,5 @@ def load_accessibility():
 
     return accesibility
 
+
 ACCESIBILITY_DICT = load_accessibility()
