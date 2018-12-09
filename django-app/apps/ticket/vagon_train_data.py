@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import itertools
 import urllib
 from urllib.parse import urljoin
@@ -143,28 +142,30 @@ class VagonInformation:
                     elif value.xpath('@id')[0].startswith('trida2d_'):
                         partial_urls = [x.xpath('@cb_href') for x in value.xpath('a')]
 
-                        partial_url = list(itertools.chain.from_iterable(partial_urls))[0].split('..')[1]
+                        partial_urls = list(filter(None, partial_urls))
 
-                        if len(partial_url.split()) == 2:
+                        partial_urls = list(itertools.chain.from_iterable(partial_urls))
+
+                        if partial_urls:
+                            partial_url = partial_urls[0].split('..')[1]
+
                             partial_url = ''.join(partial_url.split())
 
-                        if len(partial_url.split()) == 1:
-                            partial_url = ''.join(partial_url)
+                            full_vagon_img_url = urljoin('https://www.vagonweb.cz', partial_url)
 
-                        full_vagon_img_url = urljoin('https://www.vagonweb.cz', partial_url)
+                            r = requests.get(
+                                url=full_vagon_img_url,
+                                headers=self.headers
+                            )
 
-                        r = requests.get(
-                            url=full_vagon_img_url,
-                            headers=self.headers
-                        )
+                            _g = GetXMLEtree(response_data=r.text)
 
-                        _g = GetXMLEtree(response_data=r.text)
+                            full_vagon_img_xpath = '//img/@src'
 
-                        full_vagon_img_xpath = '//img/@src'
+                            full_vagon_img = sorted(list(set([x for x in _g.xml_etree.xpath(full_vagon_img_xpath)])))[
+                                -1]
 
-                        full_vagon_img = sorted(list(set([x for x in _g.xml_etree.xpath(full_vagon_img_xpath)])))[-1]
-
-                        vagon_data['vagon_img'] = full_vagon_img
+                            vagon_data['vagon_img'] = full_vagon_img
 
                 if vagon_data.get('number'):
                     final_data['cars'][current_key] = vagon_data
