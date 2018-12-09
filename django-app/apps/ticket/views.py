@@ -27,7 +27,7 @@ def generate_ics(request, ticket_id):
 
     response = HttpResponse(
         content=ics_data.to_ical(),
-        mimetype='application/force-download'
+        content_type='text/calendar'
     )
 
     response['Content-Disposition'] = 'attachment; filename={}'.format(ticket_filename)
