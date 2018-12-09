@@ -21,7 +21,7 @@ class GoogleCalendarICS:
                 'User-Agent': generate_user_agent()
             })
 
-            url = reverse('ticket', kwargs={'pk': self.ticket_id})
+            url = reverse('ticket-detail', kwargs={'pk': self.ticket_id})
 
             response = s.get(url).json()
 
