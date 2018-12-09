@@ -10,6 +10,14 @@ from apps.ticket import ticket_utils
 from apps.ticket.models import Ticket
 from apps.ticket.serializers import TicketFileUploadSerializer, TicketModelSerializer, TicketListSerializer
 
+CONTACT_PHONES = {"PKP Intercity (Grupa PKP)": "703 200 200", "PKP TLK": "703 200 200", "PKP IC": "703 200 200",
+                  "PKP Szybka Kolej Miejska w Trójmieście (Grupa PKP)": "(58) 721 21 70",
+                  "Przewozy Regionalne": "703 20 20 20", "Koleje Mazowieckie": "(22) 364 44 44",
+                  "Koleje Dolnośląskie": "(76) 753 52 05", "Koleje Wielkopolskie": "(61) 279 27 78",
+                  "Koleje Śląskie": "(32) 428 88 88", "Arriva": "801 081 515", "Szybka Kolej Miejska": "801 044 484",
+                  "Warszawska Kolej Dojazdowa": "(22) 758 00 12", "Łódzka Kolej Aglomeracyjna": "(42) 205 55 15",
+                  "Koleje Małopolskie": "703 20 20 25"}
+
 
 class TicketViewSet(viewsets.GenericViewSet):
     """
@@ -37,6 +45,9 @@ class TicketViewSet(viewsets.GenericViewSet):
 
         else:
             return r
+
+    def get_queryset(self):
+        return Ticket.objects.all()
 
     def create(self, request, *args, **kwargs):
 
@@ -76,6 +87,6 @@ class TicketViewSet(viewsets.GenericViewSet):
     def list(self, request):
         serializer = self.serializer_class_list
 
-        tickets = Ticket.objects.all().order_by('-start_time')
+        tickets = self.get_queryset().order_by('-start_time')
 
         return Response(serializer(tickets).data, status=status.HTTP_200_OK)
