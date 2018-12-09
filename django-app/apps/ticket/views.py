@@ -100,11 +100,11 @@ class TicketViewSet(viewsets.GenericViewSet):
 
             data_from_ticket['qr_code'] = base64_encoded_qr_code_str
 
-            closed_station_at_arrival = False
-            arrival_station_open_hours = open_hours[data_from_ticket["finish_place"]]
-            if not arrival_station_open_hours:
-                open_end = datetime.strptime(arrival_station_open_hours[1], "%H:%M")
-                closed_station_at_arrival = open_end.time() < data_from_ticket["finish_time"].time()
+            closed_station_at_arrival = data_from_ticket["finish_time"].time() > datetime.strptime("23:00", "%H:%M").time()
+            # arrival_station_open_hours = open_hours[data_from_ticket["finish_place"]]
+            # if not arrival_station_open_hours:
+            #     open_end = datetime.strptime(arrival_station_open_hours[1], "%H:%M")
+            #     closed_station_at_arrival = open_end.time() < data_from_ticket["finish_time"].time()
             data_from_ticket['closed_station_at_arrival'] = closed_station_at_arrival
 
             ticket = Ticket(**data_from_ticket)
