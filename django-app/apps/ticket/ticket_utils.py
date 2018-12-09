@@ -1,11 +1,14 @@
 import base64
 import io
+import json
+import os
 import re
 from datetime import datetime
 
 import PyPDF2
 import lxml.html as html
 from PIL import Image
+from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from lxml import etree
 from lxml.etree import XMLSyntaxError, ParserError
@@ -130,3 +133,15 @@ def pil_image_to_base64(image: Image) -> str:
     base64_encoded_qr_code_bytes = base64.b64encode(img_bytes)
     base64_encoded_qr_code_str = base64_encoded_qr_code_bytes.decode('ascii')
     return base64_encoded_qr_code_str
+
+
+def load_accessibility():
+    base_path = os.path.join(settings.BASE_DIR, 'apps/ticket/resources/')
+    accessibility_json = os.path.join(base_path, 'dostepnosc_dworcow.json')
+
+    with open(accessibility_json, 'rt') as f:
+        accesibility = json.load(f)
+
+    return accesibility
+
+ACCESIBILITY_DICT = load_accessibility()
