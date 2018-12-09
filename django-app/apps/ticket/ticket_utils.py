@@ -1,13 +1,39 @@
 import base64
 import io
-
-from django.core.files.uploadedfile import InMemoryUploadedFile
 import re
-from tika import parser
 from datetime import datetime
 
 import PyPDF2
+import lxml.html as html
 from PIL import Image
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from lxml import etree
+from lxml.etree import XMLSyntaxError, ParserError
+from tika import parser
+
+
+class GetXMLEtree:
+    def __init__(self, response_data):
+        self.response_data = response_data
+        self.xml_etree = self.get_xml_tree_object()
+
+    def get_xml_tree_object(self):
+        """
+        General method to parse a request's response content and return xml tree object.
+        """
+
+        try:
+            return html.fromstring(self.response_data)
+        except ParserError:
+            pass
+        except XMLSyntaxError:
+            return html.fromstring(
+                self.response_data,
+                parser=etree.XMLParser(
+                    encoding='utf-8',
+                    recover=True
+                )
+            )
 
 
 def process_ticket(ticket_file: InMemoryUploadedFile) -> dict:

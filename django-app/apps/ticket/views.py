@@ -1,17 +1,10 @@
 # from PIL import Image
-import base64
-import io
-
-from django.conf import settings
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from rest_framework import permissions
+from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets  # , permissions
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from django.shortcuts import get_object_or_404
-from django.core.files.base import ContentFile
 
 from apps.ticket import ticket_utils
 from apps.ticket.models import Ticket
