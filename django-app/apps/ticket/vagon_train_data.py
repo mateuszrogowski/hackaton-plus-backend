@@ -1,12 +1,38 @@
 # -*- coding: utf-8 -*-
 
+import itertools
 import urllib
 from urllib.parse import urljoin
 
+import lxml.html as html
 import requests
+from lxml import etree
+from lxml.etree import XMLSyntaxError, ParserError
 from user_agent import generate_user_agent
 
-from .ticket_utils import GetXMLEtree
+
+class GetXMLEtree:
+    def __init__(self, response_data):
+        self.response_data = response_data
+        self.xml_etree = self.get_xml_tree_object()
+
+    def get_xml_tree_object(self):
+        """
+        General method to parse a request's response content and return xml tree object.
+        """
+
+        try:
+            return html.fromstring(self.response_data)
+        except ParserError:
+            pass
+        except XMLSyntaxError:
+            return html.fromstring(
+                self.response_data,
+                parser=etree.XMLParser(
+                    encoding='utf-8',
+                    recover=True
+                )
+            )
 
 
 class VagonInformation:
@@ -94,11 +120,6 @@ class VagonInformation:
 
                     elif value.xpath('@id')[0].startswith('trida1a_'):
                         continue
-                        # partial_url = value.xpath('.//img/@src')[0].split('..')[1].strip()
-                        #
-                        # full_url = urljoin('https://www.vagonweb.cz', partial_url)
-                        #
-                        # vagon_data['vagon_img'] = full_url
 
                     elif value.xpath('@id')[0].startswith('trida1b_'):
                         continue
@@ -120,10 +141,30 @@ class VagonInformation:
                         continue
 
                     elif value.xpath('@id')[0].startswith('trida2d_'):
-                        vagon_img_url = value.xpath('.//a[@class="colorbox cboxElement"]/@src')
-                        print(vagon_img_url)
+                        partial_urls = [x.xpath('@cb_href') for x in value.xpath('a')]
 
-                        # partial_url = value.xpath('.//img/@src')[0].split('..')[1].strip()
+                        partial_url = list(itertools.chain.from_iterable(partial_urls))[0].split('..')[1]
+
+                        if len(partial_url.split()) == 2:
+                            partial_url = ''.join(partial_url.split())
+
+                        if len(partial_url.split()) == 1:
+                            partial_url = ''.join(partial_url)
+
+                        full_vagon_img_url = urljoin('https://www.vagonweb.cz', partial_url)
+
+                        r = requests.get(
+                            url=full_vagon_img_url,
+                            headers=self.headers
+                        )
+
+                        _g = GetXMLEtree(response_data=r.text)
+
+                        full_vagon_img_xpath = '//img/@src'
+
+                        full_vagon_img = sorted(list(set([x for x in _g.xml_etree.xpath(full_vagon_img_xpath)])))[-1]
+
+                        vagon_data['vagon_img'] = full_vagon_img
 
                 if vagon_data.get('number'):
                     final_data['cars'][current_key] = vagon_data
