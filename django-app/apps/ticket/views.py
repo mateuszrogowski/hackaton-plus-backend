@@ -21,7 +21,7 @@ def generate_ics(request, ticket_id):
 
     ics = GoogleCalendarICS(ticket_id=ticket_id)
 
-    ics_data = ics.generate_ics()
+    ics_data = ics.generate_ics(request=request)
 
     ticket_filename = 'ticket_{ticket_id}.ics'.format(ticket_id=ticket_id)
 

@@ -11,7 +11,7 @@ class GoogleCalendarICS:
     def __init__(self, ticket_id):
         self.ticket_id = ticket_id
 
-    def generate_ics(self):
+    def generate_ics(self, request):
         """
         Generates ICS file for train ticket object based on given ID.
         """
@@ -21,7 +21,7 @@ class GoogleCalendarICS:
                 'User-Agent': generate_user_agent()
             })
 
-            url = reverse('ticket-detail', kwargs={'pk': self.ticket_id})
+            url = request.build_absolute_uri(reverse('ticket-detail', kwargs={'pk': self.ticket_id}))
 
             response = s.get(url).json()
 
